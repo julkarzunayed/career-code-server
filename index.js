@@ -29,11 +29,11 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
-        const jobsCollection =  client.db("careerCode").collection('jobs');
+        const jobsCollection = client.db("careerCode").collection('jobs');
         const applicationCollection = client.db("careerCode").collection('applications');
 
         //Jobs APIs
-        app.get('/jobs', async (req, res) =>{
+        app.get('/jobs', async (req, res) => {
             const cursor = jobsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
@@ -41,17 +41,29 @@ async function run() {
 
         app.get('/jobs/:id', async (req, res) => {
             const id = req.params.id;
-            const query  = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await jobsCollection.findOne(query);
             res.send(result);
         });
 
         //Application API
+
+        app.get('/applications', async (req, res) => {
+            const email = req.query.email;
+            console.log('Email:', email);
+            const query = {
+                applicant: email
+            };
+            const result = await applicationCollection.find(query).toArray();
+            res.send(result);
+
+        })
+
         app.post('/applications', async (req, res) => {
             const application = req.body;
             const result = await applicationCollection.insertOne(application);
             res.send(result);
-        })
+        });
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
